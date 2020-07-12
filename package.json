@@ -17,5 +17,9 @@
   "bugs": {
     "url": "https://github.com/gothbarbie/websockets/issues"
   },
-  "homepage": "https://github.com/gothbarbie/websockets#readme"
+  "homepage": "https://github.com/gothbarbie/websockets#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "ws": "^7.3.1"
+  }
 }
