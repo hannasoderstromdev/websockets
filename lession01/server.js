@@ -1,7 +1,5 @@
 const http = require('http')
 const websocket = require('ws')
-const { WSAEWOULDBLOCK } = require('constants')
-
 
 const server = http.createServer((req, res) => {
     res.end('Connected. Listening on port 8000...')
