@@ -8,7 +8,7 @@ const server = http.createServer((req, res) => {
 const io = socketIo(server)
 
 io.on('connection', (socket, req) => {
-    socket.emit('Server: Welcome to the socket.io server!')
+    socket.emit('welcome', 'Server: Welcome to the socket.io server!')
     socket.on('event', (msg) => {
         console.log(msg)
     })
