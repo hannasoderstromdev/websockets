@@ -20,7 +20,6 @@
   "homepage": "https://github.com/gothbarbie/websockets#readme",
   "dependencies": {
     "express": "^4.17.1",
-    "socket.io": "^2.3.0",
     "ws": "^7.3.1"
   }
 }
