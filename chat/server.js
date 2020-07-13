@@ -1,26 +1,58 @@
 const express = require('express')
-const app = express()
 const socketIo = require('socket.io')
+const namespaces = require('./data/namespaces')
 
+const app = express()
 app.use(express.static(__dirname + '/public'))
 
 const expressServer = app.listen(8000)
 
 const ioServer = socketIo(expressServer)
 
-ioServer.of('/').on('connection', socket => {
-    console.log('Connection to /')
 
-    socket.emit('messageFromServer', { data: 'Welcome to the socketio server!', path: '/' })
-    socket.on('newMessageToServer', msg => {
-        // console.log(msg)
-        socket.emit('messageToClients', { text: msg.text })
+ioServer.on('connect', socket => {
+   const nsData = namespaces.map(ns => ({ img: ns.img, endpoint: ns.endpoint }))
+   socket.emit('nsList', nsData)
+})
+
+namespaces.forEach(ns => {
+    ioServer.of(ns.endpoint).on('connect', socket => {
+        const username = socket.handshake.query.username
+        
+        console.log(`${username} has joined ${ns.endpoint}`)
+        
+        socket.emit('nsRoomLoad', ns.rooms)
+
+        socket.on('joinRoom', roomToJoin => {
+            const roomToLeave = Object.keys(socket.rooms)[1]
+            socket.leave(roomToLeave)
+            updateUsersInRoom(ns, roomToJoin)
+
+            const nsRoom = ns.rooms.find(item => item.roomTitle === roomToJoin)
+            socket.join(roomToJoin)
+            socket.emit('historyCatchUp', nsRoom.history)
+            updateUsersInRoom(ns, roomToJoin)
+        })
+
+        socket.on('newMessageToServer', msg => {
+            const fullMsg = {
+                text: msg.text,
+                time: Date.now(),
+                username,
+                avatar: 'https://via.placeholder.com/30',
+            }
+            const roomTitle = Object.keys(socket.rooms)[1]
+            const nsRoom = ns.rooms.find(item => item.roomTitle === roomTitle)
+            nsRoom.addMessage(fullMsg)
+            
+            ioServer.of(ns.endpoint).to(roomTitle).emit('messageToClients', fullMsg)
+        })
     })
-    socket.join('level1')
-    socket.to('level1').emit('joined', `${socket.id} joined level 1 room`)
 })
 
-ioServer.of('/admin').on('connect', socket => {
-    console.log('Connection to /admin')
-    socket.emit('messageFromServer', { data: 'Welcome to the admin-channel', path: '/admin' })
-})
+function updateUsersInRoom(ns, room) {
+    ioServer.of(ns.endpoint).in(room).clients((err, clients) => {
+        console.log(`User count: ${clients.length}`)
+        ioServer.of(ns.endpoint).in(room).emit('updateUserCount', clients.length)
+    })
+}
