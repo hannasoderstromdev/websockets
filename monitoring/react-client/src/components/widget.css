@@ -1,0 +1,40 @@
+.bold {
+    font-weight: bold;
+}
+
+.widget {
+    margin-bottom: 25px;
+    border-bottom: 3px solid #ccc;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.widget-item {
+    flex: 1;
+}
+
+.not-active {
+    color: #8b0000;
+    font-size: 100px;
+    position: absolute;
+    z-index: 2;
+}
+
+.cpu, .mem {
+    position: relative;
+    text-align: center;
+}
+
+.widget-text {
+    position: absolute;
+    transform: translate(-45%, -50%);
+    top: 50%;
+    left: 50%;
+    font-size: 30px;
+}
+
+.canvas-wrapper {
+    position: relative;
+}
