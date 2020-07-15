@@ -1,8 +1,45 @@
 const os = require('os')
+const io = require('socket.io-client')
 
-const cpus = os.cpus()
+const socket = io('http://127.0.0.1:8181')
+
+socket.on('connect', () => {
+    console.log('Connected to socket server.')
+    const nI = os.networkInterfaces()
+    let macA
+    
+    for (let key in nI) {
+      const { internal, mac } = nI[key][0]
+      if (!internal) {
+        macA = mac
+        break
+      }
+    }
+
+    const NODE_SECRET = 'pokpokwpo4kt4r'
+    socket.emit('clientAuth', NODE_SECRET)
+
+
+    getPerformanceData().then(data => {
+        data.macA = macA  // Add property
+        socket.emit('initPerfData', data)
+    })
+   
+    let perfDataInterval = setInterval(() => {
+        getPerformanceData().then(data => {
+            data.macA = macA  // Add property
+            socket.emit('perfData', data)
+        })
+    }, 1000)
+
+    socket.on('disconnect', () => {
+        clearInterval(perfDataInterval)
+    })
+
+})
 
 async function getPerformanceData() {
+    const cpus = os.cpus()
     const osType = os.type() === 'Darwin' ? 'MacOS' : os.type()
     const upTime = os.uptime()
     const freeMem = os.freemem()
@@ -52,4 +89,3 @@ function getCpuLoad() {
 }
 
 
-getPerformanceData().then(data => console.log(data))
