@@ -18,12 +18,18 @@ function Widget({ data: {
     usedMemPercentage,
     osType,
     upTime,
+    online,
 } }) {
-    const cpu = { cpuAverage, cpuLoad }
-    const mem = { freeMem, totalMem, totalMem, usedMemPercentage }
-    const info = { macA, osType, upTime, cpuModel, cpuSpeed, numCores, }
+    let cpuId = `cpu-id-${macA.split(':').join('')}`
+    let memId = `mem-id-${macA.split(':').join('')}`
+    const cpu = { cpuAverage, cpuLoad, cpuId }
+    const mem = { freeMem, totalMem, usedMemPercentage, memId }
+    const info = { macA, osType, upTime, cpuModel, cpuSpeed, numCores }
+
+    const status = online ? <div className="status status-online">Online</div> : <div className="status status-offline">Offline</div>
   return (
       <div className="widget">
+        {status}
         <Cpu {...cpu} />
         <Mem {...mem}/>
         <Info {...info} />

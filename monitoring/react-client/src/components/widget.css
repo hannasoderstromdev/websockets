@@ -15,11 +15,19 @@
     flex: 1;
 }
 
-.not-active {
-    color: #8b0000;
-    font-size: 100px;
+.status {
+    font-size: 20px;
+    font-weight: bold;
     position: absolute;
     z-index: 2;
+}
+
+.status-offline {
+    color: #8b0000;
+}
+
+.status-online {
+    color: #008b00;
 }
 
 .cpu, .mem {
