@@ -50,8 +50,8 @@ async function getPerformanceData() {
     const numCores = cpus.length
     const cpuAverage = calcCpuAverage()
     const cpuLoad = await getCpuLoad()
- 
-    return { osType, upTime, freeMem, totalMem, usedMemPercentage, cpuModel, cpuSpeed, numCores, cpuAverage, cpuLoad }
+    const online = true
+    return { osType, upTime, freeMem, totalMem, usedMemPercentage, cpuModel, cpuSpeed, numCores, cpuAverage, cpuLoad, online }
 }
 
 
