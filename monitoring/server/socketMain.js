@@ -2,9 +2,7 @@ const mongoose = require('mongoose')
 mongoose.connect('mongodb://127.0.0.1/perfData', { useNewUrlParser: true, useUnifiedTopology: true })
 const Machine = require('./models/Machine')
 
-function socketMain(io, socket) {
-    console.log('Someone called me. I\'m socketMain.', socket.id)
-    
+function socketMain(io, socket) {  
     let macA
 
     socket.on('clientAuth', key => {
@@ -16,9 +14,24 @@ function socketMain(io, socket) {
         } else if (key === APP_SECRET) {
             socket.join('ui')
             console.log('A React client has joined')
+            Machine.find({}, (err, docs) => {
+                docs.forEach(machine => {
+                    machine.online = false // default to offline
+                    io.to('ui').emit('data', machine)
+                })
+            })
         } else {
             socket.disconnect(true)
         }
+    })
+
+    socket.on('disconnect', () => {
+        Machine.find({ macA: macA }, (err, docs) => {
+            if (docs.length > 0) {
+                docs[0].online = false
+                io.to('ui').emit('data', docs[0])
+            }
+        })
     })
 
     socket.on('initPerfData', async data => {
@@ -33,7 +46,7 @@ function socketMain(io, socket) {
     })
 
     socket.on('perfData', data => {
-        console.log('tick...')
+        // console.log('tick...')
         io.to('ui').emit('data', data)
     })
 }
